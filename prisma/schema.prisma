@@ -1,0 +1,40 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum PaymentStatus {
+    pending
+    processing
+    succeeded
+    failed
+}
+
+enum PaymentMethod {
+    card
+    cash
+    transfer
+    pix
+}
+
+model Payment {
+    id             String        @id @default(cuid())
+    orderId        String
+    userId         String
+    amountCents    Int
+    currency       String
+    status         PaymentStatus @default(pending)
+    method         PaymentMethod @default(card)
+    provider       String
+    providerRef    String?       // provider payment id
+    idempotencyKey String?       @unique
+    description    String?
+    createdAt      DateTime      @default(now())
+    updatedAt      DateTime      @updatedAt
+
+    @@index([orderId])
+}
