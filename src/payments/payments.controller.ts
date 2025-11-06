@@ -13,7 +13,13 @@ import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PaymentsService } from './payments.service';
 import { AuthGuard } from './guards/jwt.guard';
 import { PaginationDto } from './dto/pagination.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiHeader,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { type PaymentRequest } from './provider/payment-provider.interface';
 
 @ApiTags('Payments')
@@ -23,30 +29,29 @@ import { type PaymentRequest } from './provider/payment-provider.interface';
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
-  // TODO: define personalized decorators for common responses (swagger)
   @Post()
-  // @ApiOperation({
-  //   summary: 'Crear nuevo pago',
-  //   description: 'Crea un nuevo pago en el sistema',
-  // })
-  // @ApiHeader({
-  //   name: 'idempotency-key',
-  //   description: 'Clave de idempotencia para evitar pagos duplicados',
-  //   required: false,
-  // })
+  @ApiOperation({
+    summary: 'Crear nuevo pago',
+    description: 'Crea un nuevo pago en el sistema',
+  })
+  @ApiHeader({
+    name: 'idempotency-key',
+    description: 'Clave de idempotencia para evitar pagos duplicados',
+    required: false,
+  })
   // @ApiResponse({
   //   status: 201,
   //   description: 'Pago creado exitosamente',
-  //   type: PaymentResponseDto,
+  //   type: PaymentResponse,
   // })
-  // @ApiResponse({
-  //   status: 400,
-  //   description: 'Datos inválidos',
-  // })
-  // @ApiResponse({
-  //   status: 409,
-  //   description: 'Pago duplicado (idempotency key)',
-  // })
+  @ApiResponse({
+    status: 400,
+    description: 'Datos inválidos',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Pago duplicado (idempotency key)',
+  })
   createPayment(
     @Body() paymentDto: CreatePaymentDto,
     @Headers('idempotency-key') idempotencyKey: string,
@@ -59,15 +64,13 @@ export class PaymentsController {
     return this.paymentsService.processPayment(data);
   }
 
-  // @Post(':id/retry')
-  // retryPayment(@Param('id', ParseUUIDPipe) id: string) {
-  //   return this.paymentsService.retryPayment(id);
-  // }
-
-  // @Post(':id/cancel')
-  // cancelPayment(@Param('id', ParseUUIDPipe) id: string) {
-  //   return this.paymentsService.cancelPayment(id);
-  // }
+  @Post(':id/retry')
+  retryPayment(
+    @Body() data: PaymentRequest,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return this.paymentsService.retryPayment(id, data);
+  }
 
   @Get('/users/:userId')
   getPaymentsByUserId(

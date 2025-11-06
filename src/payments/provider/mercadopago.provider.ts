@@ -8,9 +8,18 @@ import {
   PaymentResult,
 } from './payment-provider.interface';
 import { PaymentStatus } from 'src/common/enums/payment-status.enum';
-import type { IStatusMapper } from './interfaces/status-mapper.interface';
-import type { IWebhookHandler } from './interfaces/webhook-handler.interface';
-import type { IRefundService } from './interfaces/refund-service.interface';
+import {
+  STATUS_MAPPER_TOKEN,
+  type IStatusMapper,
+} from './interfaces/status-mapper.interface';
+import {
+  WEBHOOK_HANDLER_TOKEN,
+  type IWebhookHandler,
+} from './interfaces/webhook-handler.interface';
+import {
+  REFUND_SERVICE_TOKEN,
+  type IRefundService,
+} from './interfaces/refund-service.interface';
 
 @Injectable()
 export class MercadoPagoProvider extends PaymentProviderService {
@@ -20,11 +29,11 @@ export class MercadoPagoProvider extends PaymentProviderService {
 
   constructor(
     private readonly configService: ConfigService,
-    @Inject('IStatusMapper')
+    @Inject(STATUS_MAPPER_TOKEN)
     private readonly statusMapper: IStatusMapper,
-    @Inject('IWebhookHandler')
+    @Inject(WEBHOOK_HANDLER_TOKEN)
     private readonly webhookHandler: IWebhookHandler,
-    @Inject('IRefundService')
+    @Inject(REFUND_SERVICE_TOKEN)
     private readonly refundService: IRefundService,
   ) {
     super();

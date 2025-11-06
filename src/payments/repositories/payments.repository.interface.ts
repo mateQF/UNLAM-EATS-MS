@@ -17,5 +17,16 @@ export interface IPaymentsRepository {
     providerRef: string,
     pagination: PaginationDto,
   ): Promise<Payment[]>;
-  findByFilters(filters: any, pagination: PaginationDto): Promise<Payment[]>;
+  findByFilters(
+    filters: {
+      userId?: string;
+      orderId?: string;
+      status?: string;
+      from?: string;
+      to?: string;
+    },
+    pagination: PaginationDto,
+  ): Promise<Payment[]>;
 }
+
+export const PAYMENTS_REPOSITORY = Symbol('PAYMENTS_REPOSITORY');

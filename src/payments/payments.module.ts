@@ -8,13 +8,17 @@ import { MercadoPagoStatusMapper } from './provider/services/mercadopago-status-
 import { MercadoPagoWebhookHandler } from './provider/services/mercadopago-webhook-handler.service';
 import { MercadoPagoRefundService } from './provider/services/mercadopago-refund.service';
 import { PaymentProviderService } from './provider/payment-provider.interface';
+import { PAYMENTS_REPOSITORY } from './repositories/payments.repository.interface';
+import { STATUS_MAPPER_TOKEN } from './provider/interfaces/status-mapper.interface';
+import { WEBHOOK_HANDLER_TOKEN } from './provider/interfaces/webhook-handler.interface';
+import { REFUND_SERVICE_TOKEN } from './provider/interfaces/refund-service.interface';
 
 @Module({
   providers: [
     PaymentsService,
     JwtService,
     {
-      provide: 'IPaymentsRepository',
+      provide: PAYMENTS_REPOSITORY,
       useClass: PrismaPaymentsRepository,
     },
     {
@@ -22,15 +26,15 @@ import { PaymentProviderService } from './provider/payment-provider.interface';
       useClass: MercadoPagoProvider,
     },
     {
-      provide: 'IStatusMapper',
+      provide: STATUS_MAPPER_TOKEN,
       useClass: MercadoPagoStatusMapper,
     },
     {
-      provide: 'IWebhookHandler',
+      provide: WEBHOOK_HANDLER_TOKEN,
       useClass: MercadoPagoWebhookHandler,
     },
     {
-      provide: 'IRefundService',
+      provide: REFUND_SERVICE_TOKEN,
       useClass: MercadoPagoRefundService,
     },
   ],

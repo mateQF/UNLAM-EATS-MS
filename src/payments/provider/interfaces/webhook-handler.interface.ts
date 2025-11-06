@@ -23,3 +23,5 @@ export interface IWebhookHandler {
     secret: string,
   ): boolean;
 }
+
+export const WEBHOOK_HANDLER_TOKEN = Symbol('IWebhookHandler');

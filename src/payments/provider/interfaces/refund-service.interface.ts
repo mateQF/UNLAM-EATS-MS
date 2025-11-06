@@ -5,3 +5,5 @@ export interface IRefundService {
     amount?: number;
   }>;
 }
+
+export const REFUND_SERVICE_TOKEN = Symbol('IRefundService');

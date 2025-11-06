@@ -5,3 +5,5 @@ export interface IStatusMapper {
   mapPaymentMethod(internalMethod: string): string;
   isSuccessStatus(status: string | null | undefined): boolean;
 }
+
+export const STATUS_MAPPER_TOKEN = Symbol('IStatusMapper');
