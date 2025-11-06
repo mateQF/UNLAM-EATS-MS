@@ -12,15 +12,15 @@ import {
 export class CreatePaymentDto {
   @ApiProperty({
     description: 'ID of the order associated with the payment',
-    example: 'order_123456',
+    example: 1,
   })
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  orderId: string;
+  orderId: number;
 
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  userId: string;
+  userId: number;
 
   @IsNumber()
   @IsPositive()

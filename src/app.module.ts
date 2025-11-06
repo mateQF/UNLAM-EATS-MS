@@ -5,10 +5,14 @@ import { PrismaModule } from './database/prisma/prisma.module';
 import { JwtService } from '@nestjs/jwt';
 import { HealthModule } from './health/health.module';
 import { RedisModule } from './database/redis/redis.module';
+import { envValidationSchema } from './config/env.config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema: envValidationSchema,
+    }),
     PaymentsModule,
     PrismaModule,
     HealthModule,

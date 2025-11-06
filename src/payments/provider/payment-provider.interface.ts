@@ -1,4 +1,12 @@
 import { PaymentStatus } from 'src/common/enums/payment-status.enum';
+import { PreferenceResponse } from 'mercadopago/dist/clients/preference/commonTypes';
+
+export type MercadoPagoPaymentResponse = {
+  id: string;
+  initPoint?: string;
+  sandboxInitPoint: string | undefined;
+  raw: PreferenceResponse;
+};
 
 export interface PaymentRequest {
   id: string;
@@ -17,15 +25,16 @@ export interface PaymentResult {
 }
 
 export abstract class PaymentProviderService {
-  abstract processPayment(request: PaymentRequest): Promise<PaymentResult>;
   abstract getPaymentStatus(providerRef: string): Promise<PaymentResult>;
-  abstract retryPayment(
-    originalProviderRef: string,
-    newRequest: PaymentRequest,
-  ): Promise<PaymentResult>;
-  abstract cancelPayment(providerTransactionId: string): Promise<PaymentResult>;
-  abstract refundPayment(
-    providerTransactionId: string,
-    amountCents?: number,
-  ): Promise<PaymentResult>;
+  abstract createPreference(
+    items: {
+      title: string;
+      unit_price: number;
+      quantity?: number;
+      currency?: string;
+    }[],
+    externalReference: string,
+  ): Promise<MercadoPagoPaymentResponse>;
 }
+
+export const PAYMENT_PROVIDER_SERVICE_TOKEN = Symbol('PaymentProviderService');

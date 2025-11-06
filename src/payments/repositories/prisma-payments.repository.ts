@@ -34,19 +34,19 @@ export class PrismaPaymentsRepository implements IPaymentsRepository {
     });
   }
 
-  findById(id: string): Promise<Payment | null> {
+  findById(id: number): Promise<Payment | null> {
     return this.prismaService.payment.findUnique({
       where: { id },
     });
   }
 
-  findByOrderId(orderId: string): Promise<Payment[]> {
+  findByOrderId(orderId: number): Promise<Payment[]> {
     return this.prismaService.payment.findMany({
       where: { orderId },
     });
   }
 
-  findByUserId(userId: string, pagination: PaginationDto): Promise<Payment[]> {
+  findByUserId(userId: number, pagination: PaginationDto): Promise<Payment[]> {
     const { skip, take } = this.getPaginationParams(pagination);
     return this.prismaService.payment.findMany({
       where: { userId },
@@ -57,7 +57,7 @@ export class PrismaPaymentsRepository implements IPaymentsRepository {
   }
 
   updateStatus(
-    id: string,
+    id: number,
     status: PaymentStatus,
     providerRef?: string,
   ): Promise<Payment> {
@@ -82,27 +82,35 @@ export class PrismaPaymentsRepository implements IPaymentsRepository {
     });
   }
 
-  findByProviderRef(
-    providerRef: string,
-    pagination: PaginationDto,
-  ): Promise<Payment[]> {
-    const { skip, take } = this.getPaginationParams(pagination);
-    return this.prismaService.payment.findMany({
-      where: { providerRef },
-      skip,
-      take,
+  updateProviderRef(id: number, providerRef: string): Promise<Payment> {
+    return this.prismaService.payment.update({
+      where: { id },
+      data: { providerRef },
     });
   }
 
-  findByFilters(
-    filters: Partial<Omit<Payment, 'id' | 'createdAt' | 'updatedAt'>>,
-    pagination: PaginationDto,
-  ): Promise<Payment[]> {
-    const { skip, take } = this.getPaginationParams(pagination);
+  updatePaymentData(
+    paymentId: number,
+    { providerRef, status }: { providerRef: string; status: PaymentStatus },
+  ) {
+    return this.prismaService.payment.update({
+      where: { id: paymentId },
+      data: {
+        providerRef,
+        status,
+      },
+    });
+  }
+
+  findByProviderRef(providerRef: string): Promise<Payment[]> {
     return this.prismaService.payment.findMany({
-      where: { ...filters },
-      skip,
-      take,
+      where: { providerRef },
+    });
+  }
+
+  findByIdempotencyKey(key: string): Promise<Payment | null> {
+    return this.prismaService.payment.findUnique({
+      where: { idempotencyKey: key },
     });
   }
 }

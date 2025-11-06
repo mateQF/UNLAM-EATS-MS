@@ -22,9 +22,9 @@ enum PaymentMethod {
 }
 
 model Payment {
-    id             String        @id @default(cuid())
-    orderId        String
-    userId         String
+    id             Int           @id @default(autoincrement())
+    orderId        Int
+    userId         Int
     amountCents    Int
     currency       String
     status         PaymentStatus @default(pending)
