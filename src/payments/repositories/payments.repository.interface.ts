@@ -16,10 +16,22 @@ export interface IPaymentsRepository {
   findByProviderRef(providerRef: string): Promise<Payment[]>;
   updatePaymentData(
     paymentId: number,
-    { providerRef, status }: { providerRef: string; status: PaymentStatus },
+    {
+      providerRef,
+      providerPreferenceId,
+      status,
+      externalReference,
+    }: {
+      providerRef?: string;
+      providerPreferenceId?: string;
+      status: PaymentStatus;
+      externalReference: string;
+    },
   ): Promise<Payment>;
   updateProviderRef(id: number, providerRef: string): Promise<Payment>;
   findByIdempotencyKey(key: string): Promise<Payment | null>;
+  findByPreferenceId(preferenceId: string): Promise<Payment | null>;
+  findProcessingByOrderId(orderId: number): Promise<Payment | null>;
 }
 
 export const PAYMENTS_REPOSITORY = Symbol('PAYMENTS_REPOSITORY');

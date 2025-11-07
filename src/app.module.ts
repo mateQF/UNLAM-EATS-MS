@@ -6,6 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { HealthModule } from './health/health.module';
 import { RedisModule } from './database/redis/redis.module';
 import { envValidationSchema } from './config/env.config';
+import { WebhooksModule } from './webhooks/webhooks.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { envValidationSchema } from './config/env.config';
     PrismaModule,
     HealthModule,
     RedisModule,
+    WebhooksModule,
   ],
   providers: [JwtService],
   controllers: [],

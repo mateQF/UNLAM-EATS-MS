@@ -14,7 +14,6 @@ export class PrismaPaymentsRepository implements IPaymentsRepository {
     const limit = pagination.limit || 10;
     const skip = (page - 1) * limit;
     const take = limit;
-
     return { skip, take };
   }
 
@@ -27,22 +26,32 @@ export class PrismaPaymentsRepository implements IPaymentsRepository {
         currency: data.currency,
         method: data.method,
         description: data.description,
-        status: 'pending',
+        status: PaymentStatus.pending,
         provider: data.provider,
-        idempotencyKey: idempotencyKey,
+        idempotencyKey,
       },
     });
   }
 
   findById(id: number): Promise<Payment | null> {
-    return this.prismaService.payment.findUnique({
-      where: { id },
-    });
+    return this.prismaService.payment.findUnique({ where: { id } });
   }
 
   findByOrderId(orderId: number): Promise<Payment[]> {
-    return this.prismaService.payment.findMany({
-      where: { orderId },
+    return this.prismaService.payment.findMany({ where: { orderId } });
+  }
+
+  findByPreferenceId(preferenceId: string): Promise<Payment | null> {
+    return this.prismaService.payment.findFirst({
+      where: { providerPreferenceId: preferenceId },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  findProcessingByOrderId(orderId: number): Promise<Payment | null> {
+    return this.prismaService.payment.findFirst({
+      where: { orderId, status: PaymentStatus.processing },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
@@ -59,15 +68,11 @@ export class PrismaPaymentsRepository implements IPaymentsRepository {
   updateStatus(
     id: number,
     status: PaymentStatus,
-    providerRef?: string,
+    providerRef?: string | null,
   ): Promise<Payment> {
-    return this.prismaService.payment.update({
-      where: { id },
-      data: {
-        status,
-        providerRef,
-      },
-    });
+    const data: Record<string, unknown> = { status };
+    if (typeof providerRef !== 'undefined') data.providerRef = providerRef;
+    return this.prismaService.payment.update({ where: { id }, data });
   }
 
   findByStatus(
@@ -79,6 +84,7 @@ export class PrismaPaymentsRepository implements IPaymentsRepository {
       where: { status },
       skip,
       take,
+      orderBy: { createdAt: 'desc' },
     });
   }
 
@@ -89,23 +95,33 @@ export class PrismaPaymentsRepository implements IPaymentsRepository {
     });
   }
 
+  // ✅ Update parcial: solo setea los campos presentes (no pisa providerPreferenceId si no viene)
   updatePaymentData(
     paymentId: number,
-    { providerRef, status }: { providerRef: string; status: PaymentStatus },
-  ) {
+    patch: {
+      providerRef?: string | null;
+      status?: PaymentStatus;
+      externalReference?: string | null;
+      providerPreferenceId?: string | null;
+    },
+  ): Promise<Payment> {
+    const data: Record<string, unknown> = {};
+    if (typeof patch.providerRef !== 'undefined')
+      data.providerRef = patch.providerRef;
+    if (typeof patch.status !== 'undefined') data.status = patch.status;
+    if (typeof patch.externalReference !== 'undefined')
+      data.externalReference = patch.externalReference;
+    if (typeof patch.providerPreferenceId !== 'undefined')
+      data.providerPreferenceId = patch.providerPreferenceId;
+
     return this.prismaService.payment.update({
       where: { id: paymentId },
-      data: {
-        providerRef,
-        status,
-      },
+      data,
     });
   }
 
   findByProviderRef(providerRef: string): Promise<Payment[]> {
-    return this.prismaService.payment.findMany({
-      where: { providerRef },
-    });
+    return this.prismaService.payment.findMany({ where: { providerRef } });
   }
 
   findByIdempotencyKey(key: string): Promise<Payment | null> {

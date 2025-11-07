@@ -6,10 +6,11 @@ import { PrismaPaymentsRepository } from './repositories/prisma-payments.reposit
 import { MercadoPagoProvider } from './provider/mercadopago.provider';
 import { MercadoPagoStatusMapper } from './provider/services/mercadopago-status-mapper.service';
 import { MercadoPagoWebhookHandler } from './provider/services/mercadopago-webhook-handler.service';
-import { PAYMENT_PROVIDER_SERVICE_TOKEN } from './provider/payment-provider.interface';
+import { PaymentProviderService } from './provider/payment-provider.interface';
 import { PAYMENTS_REPOSITORY } from './repositories/payments.repository.interface';
 import { STATUS_MAPPER_TOKEN } from './provider/interfaces/status-mapper.interface';
 import { WEBHOOK_HANDLER_TOKEN } from './provider/interfaces/webhook-handler.interface';
+import { PaymentsReturnController } from './controllers/payments-return.controller';
 
 @Module({
   providers: [
@@ -20,7 +21,7 @@ import { WEBHOOK_HANDLER_TOKEN } from './provider/interfaces/webhook-handler.int
       useClass: PrismaPaymentsRepository,
     },
     {
-      provide: PAYMENT_PROVIDER_SERVICE_TOKEN,
+      provide: PaymentProviderService,
       useClass: MercadoPagoProvider,
     },
     {
@@ -32,6 +33,7 @@ import { WEBHOOK_HANDLER_TOKEN } from './provider/interfaces/webhook-handler.int
       useClass: MercadoPagoWebhookHandler,
     },
   ],
-  controllers: [PaymentsController],
+  controllers: [PaymentsController, PaymentsReturnController],
+  exports: [PaymentsService],
 })
 export class PaymentsModule {}

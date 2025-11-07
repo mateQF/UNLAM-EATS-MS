@@ -5,27 +5,27 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import * as bodyParser from 'body-parser';
-import { Request } from 'express';
+import { captureRawBody } from './utils/rawBody';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bodyParser: false });
+
+  app.use(
+    '/webhook/mercadopago',
+    bodyParser.raw({
+      type: 'application/json',
+      limit: '1mb',
+      verify: captureRawBody,
+    }),
+  );
 
   app.use(
     bodyParser.json({
-      verify: (req: Request & { rawBody?: string }, _res, buf) => {
-        req.rawBody = buf && buf.length ? buf.toString('utf8') : '';
-      },
+      limit: '1mb',
+      verify: captureRawBody,
     }),
   );
-
-  app.use(
-    bodyParser.urlencoded({
-      extended: true,
-      verify: (req: Request & { rawBody?: string }, _res, buf) => {
-        req.rawBody = buf && buf.length ? buf.toString('utf8') : '';
-      },
-    }),
-  );
+  app.use(bodyParser.urlencoded({ extended: true }));
 
   const configService = app.get(ConfigService);
 
@@ -78,8 +78,6 @@ async function bootstrap() {
 
   const PORT = configService.get<number>('PORT') || 3000;
   await app.listen(PORT);
-  console.log(`🚀 App running on http://localhost:${PORT}`);
-  console.log(`📚 Swagger docs on http://localhost:${PORT}/api/docs`);
 }
 
 void bootstrap();

@@ -22,19 +22,23 @@ enum PaymentMethod {
 }
 
 model Payment {
-    id             Int           @id @default(autoincrement())
-    orderId        Int
-    userId         Int
-    amountCents    Int
-    currency       String
-    status         PaymentStatus @default(pending)
-    method         PaymentMethod @default(card)
-    provider       String
-    providerRef    String?       // provider payment id
-    idempotencyKey String?       @unique
-    description    String?
-    createdAt      DateTime      @default(now())
-    updatedAt      DateTime      @updatedAt
+    id                   Int           @id @default(autoincrement())
+    orderId              Int
+    userId               Int
+    amountCents          Int
+    currency             String
+    status               PaymentStatus @default(pending)
+    method               PaymentMethod @default(card)
+    provider             String
+    providerRef          String? // provider payment id
+    providerPreferenceId String?
+    externalReference    String?
+    idempotencyKey       String?       @unique
+    description          String?
+    createdAt            DateTime      @default(now())
+    updatedAt            DateTime      @updatedAt
 
-    @@index([orderId])
+    @@index([providerRef])
+    @@index([providerPreferenceId])
+    @@index([orderId, status])
 }

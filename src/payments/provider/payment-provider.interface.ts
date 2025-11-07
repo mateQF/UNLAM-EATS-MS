@@ -22,6 +22,9 @@ export interface PaymentResult {
   providerTransactionId: string;
   status: PaymentStatus;
   error?: string;
+  preferenceId?: string;
+  externalReference?: string;
+  merchantOrderId?: string | number;
 }
 
 export abstract class PaymentProviderService {
@@ -35,6 +38,18 @@ export abstract class PaymentProviderService {
     }[],
     externalReference: string,
   ): Promise<MercadoPagoPaymentResponse>;
-}
 
-export const PAYMENT_PROVIDER_SERVICE_TOKEN = Symbol('PaymentProviderService');
+  getMerchantOrder(_merchantOrderId: string): Promise<unknown> {
+    console.log(_merchantOrderId);
+    return Promise.reject(
+      new Error('getMerchantOrder not implemented for this provider'),
+    );
+  }
+
+  getPaymentStatusByMerchantOrder(
+    _merchantOrderId: string,
+  ): Promise<PaymentResult | null> {
+    console.log(_merchantOrderId);
+    return Promise.resolve(null);
+  }
+}
